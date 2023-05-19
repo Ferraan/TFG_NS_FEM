@@ -58,8 +58,8 @@ DIRICHLET(icond).PRESCRIBED_Uy = 0 ;
 % 4. Neumann Boundary conditions (prescribed flux)
 % ------------------------------------------------
 icond= 1 ;
-NEUMANN(icond).NUMBER_LINE = 1;  % Line 
-NEUMANN(icond).PRESCRIBED_qBAR= 0 ;  % CONSTANT Prescribed heat flux vector x   normal unit vector to the line
+NEUMANN(icond).NUMBER_LINE = 3;  % Line 
+NEUMANN(icond).PRESCRIBED_qBAR= 3 ;  % CONSTANT Prescribed heat flux vector x   normal unit vector to the line
 
 
 % -------------------------------------------

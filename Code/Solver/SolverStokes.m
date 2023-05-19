@@ -1,4 +1,4 @@
-function [u,v,p] = SolverStokes(COOR_v,rnod_v,dR_v,COOR_p,rnod_p,dR_p,K,G)
+function [u,v,p] = SolverStokes(COOR_v,rnod_v,dR_v,COOR_p,rnod_p,dR_p,K,G,F)
 % Solves the linear system of equations that result from Stokes flow
 %Inputs:
 %   - COOR_v: Matrix with the coordiantes of velocity nodes
@@ -35,10 +35,11 @@ function [u,v,p] = SolverStokes(COOR_v,rnod_v,dR_v,COOR_p,rnod_p,dR_p,K,G)
     Gr = G(DOFl_p,DOFr_v);
     Klr = K(DOFl_v,DOFr_v);
     L = zeros(length(DOFl_p));
+    Fl=F(DOFl_v);
 
     A=[Kll GlT; Gl L];
-    B=[-Klr*dR_v; -Gr*dR_v];
-
+    B=[Fl-Klr*dR_v; -Gr*dR_v];
+    
     % Solution of the system
     d = A\B;
     

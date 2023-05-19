@@ -15,6 +15,8 @@ switch TypeElement
     case 'Linear'
         if nnodeE ==2
             [weig,posgp,shapef,dershapef] = Linear2NInPoints(TypeIntegrand) ;
+        elseif nnodeE==3
+            [weig,posgp,shapef,dershapef] = Linear3NInPoints(TypeIntegrand) ;
         else
             error('Option not implemented')
         end

@@ -1,4 +1,4 @@
-function [K,G,Bst,OmegaGlo] = ComputeKG(COOR_v,CN_v,COOR_p,CN_p,TypeElement_v, TypeElement_p,nu,debug,ViscMglo) 
+function [K,G,F,Bst,OmegaGlo] = ComputeKGF(COOR_v,CN_v,COOR_p,CN_p,CNb,tracglo,TypeElement_v, TypeElement_p,TypeElementB,nu,ViscMglo,debug) 
 %%%%
 % This subroutine   returns the global conductance matrix K,
 % the global gradient operator G
@@ -34,18 +34,26 @@ nnodeE_v = size(CN_v,2) ; %Number of nodes per element
 nnode_p = size(COOR_p,1);  % Number of nodes
 nnodeE_p = size(CN_p,2) ; %Number of nodes per element 
 
-% Determine Gauss weights, shape functions and derivatives  
-TypeIntegrand = 'K'; 
 
 
+%%%Assembly of K
 [ Belem, wSTs, wST, ~] = ComputeBelemALL(COOR_v,CN_v,TypeElement_v,nstrain) ;
 [K,Bst,OmegaGlo] = AssemblyMethodBCB(wSTs,Belem,nstrain,nelem,nnodeE_v,ndim,CN_v,nnode_v,wST,ViscMglo) ;
+%%%Assembly of G
 [Nelem]=ComputeNelemALL(COOR_p,CN_p,TypeElement_p,1);
 [G]=AssemblyNCB(Nelem,nstrain,nelem,4,ndim,9,CN_p,nnode_p,OmegaGlo,Bst);
+
+% Assembly of global traction vector (boundary contribution)
+disp('Computing  global tractions vector (boundary contribution) Fbnd...')
+Fbnd = FdisCOMP(COOR_v,CNb,TypeElementB, tracglo,2) ; 
+%%%%Body forces not coded.
+F=Fbnd;
 
 %%%%Naive method
     if(debug)
         disp('Begginning K and G naive method assembly');
+        % Determine Gauss weights, shape functions and derivatives  
+        TypeIntegrand = 'K'; 
         time1=tic;
         Kslow = sparse([],[],[],nnode_v*ndim,nnode_v*ndim,nnodeE_v*ndim*nelem) ;
         

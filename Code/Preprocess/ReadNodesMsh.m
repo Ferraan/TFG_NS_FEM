@@ -16,10 +16,13 @@ if exist(nameDAT3,'file')
             INDX = find(DDD(:,2) == inod) ;
             NODES_Nods{inodLOC} = DDD(INDX,1) ;
         end
+        rnod=cell2mat(NODES_Nods);
+    else
+        rnod=[];
     end
     
 end
 
 
-rnod=cell2mat(NODES_Nods);
+
 end

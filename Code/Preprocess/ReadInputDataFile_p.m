@@ -1,5 +1,5 @@
 function [COOR,CN,TypeElement,TypeElementB, ConductMglo,  rnod,dR,...  
-    qFLUXglo,CNb,fNOD,NameFileMesh]  = ReadInputDataFile_p(NameFileMeshDATA) 
+    tracglo,CNb,fNOD,NameFileMesh]  = ReadInputDataFile_p(NameFileMeshDATA) 
 
 
 % OUTPUTS 
@@ -46,10 +46,12 @@ PROPMAT(imat).viscosity =  1  ; %  Kinematic viscosity "imat" (ISOTROPIC)
 % -----------------------------------------------------------
 % 3. Dirichlet boundary conditions (prescribed pressure)
 % -----------------------------------------------------------
-icond = 1; % Number of condition 
-DIRICHLET(icond).NUMBER_NODE = 1 ;   % Number of line
+icond = 1; % Number of node condition 
+DIRICHLET_Nodes(icond).NUMBER_NODE = 1 ;   % Number of node (for all nodes)
+DIRICHLET_Nodes(icond).PRESCRIBED_P = 0 ;  % (constant along the line)
+icond = 2; % Number of line condition 
+DIRICHLET(icond).NUMBER_LINE = 1 ;   % Number of line
 DIRICHLET(icond).PRESCRIBED_P = 0 ;  % (constant along the line)
-
 
 
 
@@ -59,7 +61,7 @@ DIRICHLET(icond).PRESCRIBED_P = 0 ;  % (constant along the line)
 % ------------------------------------------------
 icond= 1 ;
 NEUMANN(icond).NUMBER_LINE = 1;  % Line 
-NEUMANN(icond).PRESCRIBED_qBAR= 0 ;  % CONSTANT Prescribed heat flux vector x   normal unit vector to the line
+NEUMANN(icond).PRESCRIBED_trac= 1 ;  % CONSTANT Prescribed traction
 
 
 % -------------------------------------------
@@ -118,9 +120,13 @@ end
 % List of nodes at which velocity is prescribed
 %  Specify the number of line(s) in which the velocity is imposed
 rnod = cell(length(DIRICHLET),1)  ; dR =  cell(length(DIRICHLET),1) ; 
-for  icond = 1:length(DIRICHLET)
-    rnod{icond} =  ReadNodesMsh(NameFileMesh,DIRICHLET(icond).NUMBER_NODE) ;
-    dR{icond} = DIRICHLET(icond).PRESCRIBED_P*ones(size( rnod{icond} )) ; 
+for  icond = 1:length(DIRICHLET_Nodes)
+    rnod{icond} =  ReadNodesMsh(NameFileMesh,DIRICHLET_Nodes(icond).NUMBER_NODE) ;
+    dR{icond} = DIRICHLET_Nodes(icond).PRESCRIBED_P*ones(size( rnod{icond} )) ; 
+end
+for  icond = length(DIRICHLET_Nodes)+1:length(DIRICHLET)
+    rnod{icond} =  ListOfNodesLINE(NameFileMesh,DIRICHLET(icond).NUMBER_LINE) ;
+    dR{icond,1} = DIRICHLET(icond).PRESCRIBED_P*ones(size( rnod{icond} )) ; 
 end
 % Removed repeated condions 
 % ---------------------------
@@ -134,16 +140,16 @@ dR = dR(AAA) ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 CNb = cell(length(NEUMANN),1) ; % Boundary Connectivities 
-qFLUXglo =cell(length(NEUMANN),1) ;  % Prescribed, nodal values 
+tracglo =cell(length(NEUMANN),1) ;  % Prescribed, nodal values 
 
 for icond = 1:length(NEUMANN)
     NODESb = ListOfNodesLINE(NameFileMesh,NEUMANN(icond).NUMBER_LINE) ;
     CNb{icond} = ElemBnd(CONNECTb,NODESb) ; 
-    qFLUXglo{icond} = NEUMANN(icond).PRESCRIBED_qBAR*ones(size(CNb{icond})) ;
+    tracglo{icond} = NEUMANN(icond).PRESCRIBED_trac*ones(size(CNb{icond})) ;
 end
  
 CNb = cell2mat(CNb) ; 
-qFLUXglo = cell2mat(qFLUXglo) ; 
+tracglo = cell2mat(tracglo) ; 
 
 %%%%
 
