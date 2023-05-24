@@ -1,7 +1,7 @@
 function [C] = assemblyC(COOR_v,CN_v,u,TypeElement_v,Bst,OmegaGlo,debug,Nst)
 %Assembly of matrix C
 TypeIntegrand='K';
-disp('Begginning C assembly')
+%disp('Begginning C assembly')
 
 ndim = size(COOR_v,2);   % Spatial Dimension of the problem  (2 or 3)
 nelem_v = size(CN_v,1);   % Number of elements 
@@ -18,10 +18,10 @@ time2=tic;
 time1=tic;
 Ust=AssemblyUGlobal(u,nstrain,nelem_v,nnodeE_v,ndim,ngaus,CN_v,nnode_v);
 time1=toc(time1);
-disp(['Time to assmble Ust fast: ',num2str(time1)]);
+%disp(['Time to assmble Ust fast: ',num2str(time1)]);
 C=Nst'*Ust*OmegaGlo*Bst;
 time2=toc(time2);
-disp(['Time to assmble C fast: ',num2str(time2)]);
+%disp(['Time to assmble C fast: ',num2str(time2)]);
 %%%%%%Naive method
 if(debug)
     disp('Begginning C assembly slow method');

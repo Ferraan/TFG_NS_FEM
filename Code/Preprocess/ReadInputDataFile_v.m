@@ -1,5 +1,5 @@
 function [COOR,CN,TypeElement,TypeElementB, ViscMglo,  rnod,dR,...  
-    qFLUXglo,CNb,fNOD,NameFileMesh]  = ReadInputDataFile_v(NameFileMeshDATA,Kovasznay,nu) 
+    qFLUXglo,CNb,fNOD,NameFileMesh]  = ReadInputDataFile_v(NameFileMeshDATA,Ux,nu) 
 
 % OUTPUTS 
 % --------------
@@ -49,7 +49,7 @@ DIRICHLET(icond).PRESCRIBED_Ux = 0 ;  % (constant along the line)
 DIRICHLET(icond).PRESCRIBED_Uy = 0 ;
 icond = 2; % Number of condition 
 DIRICHLET(icond).NUMBER_LINE = 2 ;   
-DIRICHLET(icond).PRESCRIBED_Ux = 1 ;
+DIRICHLET(icond).PRESCRIBED_Ux = Ux ;
 DIRICHLET(icond).PRESCRIBED_Uy = 0 ;
 
 
@@ -58,8 +58,8 @@ DIRICHLET(icond).PRESCRIBED_Uy = 0 ;
 % 4. Neumann Boundary conditions (prescribed flux)
 % ------------------------------------------------
 icond= 1 ;
-NEUMANN(icond).NUMBER_LINE = 3;  % Line 
-NEUMANN(icond).PRESCRIBED_qBAR= 3 ;  % CONSTANT Prescribed heat flux vector x   normal unit vector to the line
+NEUMANN(icond).NUMBER_LINE = 1;  % Line 
+NEUMANN(icond).PRESCRIBED_qBAR= 0 ;  % CONSTANT Prescribed heat flux vector x   normal unit vector to the line
 
 
 % -------------------------------------------
@@ -134,16 +134,6 @@ dR = cell2mat(dR) ;
 [rnod, AAA] = unique(rnod) ;
 dR = dR(AAA) ; 
 
-%Re=1;
-%lambda=Re/2-sqrt(Re*Re/4+4*pi*pi);
-if(Kovasznay)
-    for i=1:length(dR)
-        if dR(i)==1
-            y=COOR(floor((rnod(i)+1))/2,2);
-            dR(i)=1-cos(2*pi*y);
-        end
-    end
-end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 4. Neumann (natural) boundary conditions : OUTPUT: qFLUXglo, CNb

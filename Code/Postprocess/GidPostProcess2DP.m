@@ -1,13 +1,13 @@
-function GidPostProcess2D(COOR,CN,TypeElement,p,NAME_INPUT_DATA,NameFileMesh,direc); 
+function GidPostProcess2DP(COOR,CN,TypeElement,p,NAME_INPUT_DATA,NameFileMesh) 
 % Post-processing of results using GID (2D)
 if nargin==0
     load('tmp.mat')
 end
 
 % Name of the mesh file 
-NameFile_msh = [direc,NameFileMesh,'.msh'] ; 
+NameFile_msh = [NameFileMesh,'.msh'] ; 
 % Name of the results file 
-NameFile_res= [direc,NameFileMesh,'.res'] ; 
+NameFile_res= [NameFileMesh,'.res'] ; 
 
 % Writing mesh file
 MaterialType = ones(size(CN,1),1) ; 
@@ -19,3 +19,4 @@ cddd = cd ;
 NAMEFILEOPEN =  [cddd,'/',NameFile_res] ; 
 disp('open GID FILE FOR PRESSURE:')
 disp(NAMEFILEOPEN)
+end

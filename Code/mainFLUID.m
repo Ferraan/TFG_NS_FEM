@@ -15,6 +15,7 @@ addpath("Assembly/");
 addpath("Solver/")
 addpath("Postprocess/");
 addpath("AuxFunctions/");
+addpath(genpath("ML"));
 %% INPUT  %% 
 % Input data file %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 NAME_INPUT_DATA = 'DATA_ASSIGNMENT5' ;
@@ -24,31 +25,55 @@ NAME_INPUT_DATA = 'DATA_ASSIGNMENT5' ;
 %% PREPROCESS 
 % Inputs
 % ---------
-mu=0.1; %Dynamic viscosty [kg/(m s)]
+mu=0.01; %Dynamic viscosty [kg/(m s)]
 rho=1.225; %Air density [kg/m3]
 nu = mu/rho; %Kinematic Viscosity coefficient [m2/s] 
-Kovasznay=0; %Selects Boundary conditions for the kovasznay problem
-NavierStokes=1; %Select 1 for NS, 0 for Stokes
+Ux=1; %Selects Boundary conditions for the kovasznay problem
+NavierStokes=0.5; %Select 1 for NS, 0 for Stokes, 0.5 for stepped NS
 res=1e-9; %Select residual for NS
 maxiter=1e+3; %Maximum iterations for NS, if not converged exit with error
-rel_factor=0.5; %Relaxation factor, <1 for under relaxation >1 for over relaxation
+rel_factor=1; %Relaxation factor, <1 for under relaxation >1 for over relaxation
 debug=0; %Debug parameter for enabling extra functions. 0 disabled, 1 enabled.
+steps=100; %Number of stepping for solving nonlinear problem
+tolU=1e-6; %SVD tolerance for pressure and velocity
+tolP=1e-6; %SVD tolerance for pressure and velocity
+
 
 % ----------
 
 % Definition of meshes 
 % Name mesh
-NameMeshP='LidDrivenTestsTractions'; %Cylinder10,20,40,75 LidDriven75
+NameMeshP='LidDriven20'; %Cylinder10,20,40,75 LidDriven75
 NameMeshV=[NameMeshP '_v'];
+NameMeshNodes=[NameMeshP, '_MODES_'];
 % Velocity mesh
 NameFileMeshDATA = ['./Meshes/' NameMeshV];
 [COOR_v,CN_v,TypeElement_v,TypeElementB_v, ViscMglo,rnod_v,dR_v,...  
-    tracglo_v,CNb_v,~,~] = ReadInputDataFile_v(NameFileMeshDATA,Kovasznay,nu); 
+    tracglo_v,CNb_v,~,~] = ReadInputDataFile_v(NameFileMeshDATA,Ux,nu); 
 % Pressure mesh
 NameFileMeshDATA = ['./Meshes/' NameMeshP];
 [COOR_p,CN_p,TypeElement_p,TypeElementB_p, ~,rnod_p,dR_p,...  
     tracglo_p,CNb_p,~,~] = ReadInputDataFile_p(NameFileMeshDATA); 
 % ----------
+
+
+%%%Names for Post processing
+Namecase=['_mu_',num2str(mu),'_U_',num2str(Ux),'_Res_',num2str(res),'_Steps_',num2str(steps),'_tolU_',num2str(tolU),'_tolP_',num2str(tolP)];
+switch(NavierStokes)
+    case(1)
+    NameMeshV=strcat(NameMeshV,'NS',Namecase);
+    NameMeshP=strcat(NameMeshP,'NS',Namecase);
+    case(0)
+    NameMeshV=strcat(NameMeshV,'S',Namecase);
+    NameMeshP=strcat(NameMeshP,'S',Namecase);
+    case(0.5)
+    NameMeshV=strcat(NameMeshV,'NSS',Namecase);
+    NameMeshP=strcat(NameMeshP,'NSS',Namecase);
+end
+direc=['GIDPOST/',NameMeshP,'/'];
+mkdir(direc);
+NameMeshV=[direc,NameMeshV];
+NameMeshP=[direc,NameMeshP];
 
 % Number of dimensions is obtained from the mesh
 
@@ -58,27 +83,25 @@ NameFileMeshDATA = ['./Meshes/' NameMeshP];
 disp('Computing KGL')
 [K,G,F,Bst,OmegaGlo] = ComputeKGF(COOR_v,CN_v,COOR_p,CN_p,CNb_v,tracglo_v,TypeElement_v, TypeElement_p,TypeElementB_v,nu,ViscMglo,debug);
 
+
 % Solution of the system of equations
-if(NavierStokes)
-    disp('Solving the system of equations for Navier Stokes')
+switch(NavierStokes)
+    case(1)
+    disp('Solving the system of equations for Navier Stokes all at once')
     [u,v,p] = SolverNavierStokes(COOR_v,CN_v,rnod_v,dR_v,COOR_p,rnod_p,dR_p,K,G,res,TypeElement_v,maxiter,rel_factor,Bst,OmegaGlo,debug);
-else
+    case(0.5)
+     disp('Solving the system of equations for Navier Stokes in steps')
+    [u,v,p] = SolverNavierStokesSteps(COOR_v,CN_v,rnod_v,dR_v,COOR_p,rnod_p,...
+        dR_p,K,G,res,TypeElement_v,maxiter,rel_factor,Bst,OmegaGlo,debug,steps,NameMeshP,tolU,tolP);
+    case(0)
     disp('Solving the system of equations for Stokes')
-    [u,v,p] = SolverStokes(COOR_v,rnod_v,dR_v,COOR_p,rnod_p,dR_p,K,G,F);
+    [u,v,p] = SolverStokes(COOR_v,rnod_v,dR_v,COOR_p,rnod_p,dR_p,K,G,F);  
 end
 
 %% POST-PROCESS
 disp('Starting the postprocessing')
+GidPostProcess2DV(COOR_v,CN_v,TypeElement_v,u,v,NAME_INPUT_DATA,NameMeshV); 
+GidPostProcess2DP(COOR_p,CN_p,TypeElement_p,p,NAME_INPUT_DATA,NameMeshP); 
 
-%Postproc(COOR_v,COOR_p,u,v,p);
-if(NavierStokes)
-    NameMeshV=strcat(NameMeshV,'NavierStokesVisc_',num2str(nu));
-    NameMeshP=strcat(NameMeshP,'NavierStokesVisc_',num2str(nu));
-else
-    NameMeshV=strcat(NameMeshV,'StokesVisc_',num2str(nu));
-    NameMeshP=strcat(NameMeshP,'StokesVisc_',num2str(nu));
-end
-direc=['GIDPOST/',NameMeshP,'/'];
-mkdir(direc);
-GidPostProcess2DV(COOR_v,CN_v,TypeElement_v,u,v,NAME_INPUT_DATA,NameMeshV,direc); 
-GidPostProcess2DP(COOR_p,CN_p,TypeElement_p,p,NAME_INPUT_DATA,NameMeshP,direc); 
+
+

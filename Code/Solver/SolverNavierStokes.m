@@ -65,7 +65,7 @@ function [u,v,p] = SolverNavierStokes(COOR_v,CN_v,rnod_v,dR_v,COOR_p,rnod_p,dR_p
         Cll=C(DOFl_v,DOFl_v);
         Clr=C(DOFl_v,DOFr_v);
         %Solve the linear system
-        d = [Kll+Cll GlT; Gl L]\[-Klr*dR_v+Clr*dR_v; -Gr*dR_v];
+        d = [Kll+Cll GlT; Gl L]\[-Klr*dR_v-Clr*dR_v; -Gr*dR_v];
         %Assign the corresponding DOF to the velocity
         u_new(DOFl_v)=d(1:length(DOFl_v));
         u_new(DOFr_v)=dR_v;

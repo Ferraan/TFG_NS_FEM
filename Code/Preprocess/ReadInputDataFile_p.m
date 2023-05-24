@@ -46,9 +46,12 @@ PROPMAT(imat).viscosity =  1  ; %  Kinematic viscosity "imat" (ISOTROPIC)
 % -----------------------------------------------------------
 % 3. Dirichlet boundary conditions (prescribed pressure)
 % -----------------------------------------------------------
+
 icond = 1; % Number of node condition 
 DIRICHLET_Nodes(icond).NUMBER_NODE = 1 ;   % Number of node (for all nodes)
 DIRICHLET_Nodes(icond).PRESCRIBED_P = 0 ;  % (constant along the line)
+
+
 icond = 2; % Number of line condition 
 DIRICHLET(icond).NUMBER_LINE = 1 ;   % Number of line
 DIRICHLET(icond).PRESCRIBED_P = 0 ;  % (constant along the line)
@@ -61,7 +64,7 @@ DIRICHLET(icond).PRESCRIBED_P = 0 ;  % (constant along the line)
 % ------------------------------------------------
 icond= 1 ;
 NEUMANN(icond).NUMBER_LINE = 1;  % Line 
-NEUMANN(icond).PRESCRIBED_trac= 1 ;  % CONSTANT Prescribed traction
+NEUMANN(icond).PRESCRIBED_trac= 0 ;  % CONSTANT Prescribed traction
 
 
 % -------------------------------------------
