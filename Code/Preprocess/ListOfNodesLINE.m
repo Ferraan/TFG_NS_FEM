@@ -7,7 +7,7 @@ try
 
 catch
     NAME_DATA = [NameFileMesh(1:end-4),'.gid',filesep,NameFileMesh(1:end-4)] ; 
-    [NODES_FACES,NODES_LINES,NODES_Nods] = NodesFacesLinesGID(NAME_DATA) ; 
+    [NODES_FACES,NODES_LINES] = NodesFacesLinesGID(NAME_DATA) ; 
 end
 if(~isempty(NODES_LINES))
     rnod = unique(cell2mat(NODES_LINES(ILINE))) ; 

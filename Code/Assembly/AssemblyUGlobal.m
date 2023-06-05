@@ -1,5 +1,5 @@
 function Ust = AssemblyUGlobal(u,nstrain,nelem,nnodeE,ndim,ngaus,CONNECT,nnode) ;
-% This function returns the global "staked" N-matrix given the following
+% This function returns the global "staked" U-matrix given the following
 % inputs 
 %  Nelems: N-matrices at all elements  (nelem*ngaus*nstrain x nnodeE*ndim)
 % nstrain : Number of entries of the stress/strain vectors
@@ -10,7 +10,7 @@ function Ust = AssemblyUGlobal(u,nstrain,nelem,nnodeE,ndim,ngaus,CONNECT,nnode) 
 % CONNECT: Array of connectivities 
 % nnode: Number of nodes
 % %
-% J.A. Hernández, jhortega@cimne.upc.edu  (26 Oct. 2015, Barcelona, Spain)
+
 if nargin == 0
     load('tmp1.mat')
 end

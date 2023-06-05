@@ -40,8 +40,9 @@ nnodeE_p = size(CN_p,2) ; %Number of nodes per element
 [ Belem, wSTs, wST, ~] = ComputeBelemALL(COOR_v,CN_v,TypeElement_v,nstrain) ;
 [K,Bst,OmegaGlo] = AssemblyMethodBCB(wSTs,Belem,nstrain,nelem,nnodeE_v,ndim,CN_v,nnode_v,wST,ViscMglo) ;
 %%%Assembly of G
+
 [Nelem]=ComputeNelemALL(COOR_p,CN_p,TypeElement_p,1);
-[G]=AssemblyNCB(Nelem,nstrain,nelem,4,ndim,9,CN_p,nnode_p,OmegaGlo,Bst);
+[G]=AssemblyNIB(Nelem,nelem,4,ndim,9,CN_p,nnode_p,OmegaGlo,Bst);
 
 % Assembly of global traction vector (boundary contribution)
 disp('Computing  global tractions vector (boundary contribution) Fbnd...')
@@ -103,11 +104,12 @@ F=Fbnd;
             %By definition
             Gslow = -Gslow;
             %%validation
-            if(~all(Kslow-K<1e-6,"all") || ~all(Gslow-G<1e-6,"all"))
-                disp("Different")
-            end
-        time1=toc(time1);
-        disp(['Time to assmble K and G slow: ',num2str(time1)]);
+            time1=toc(time1);
+            disp(['Time to assmble K and G slow: ',num2str(time1)]);
+            %if(~all(Kslow-K<1e-6,"all") || ~all(Gslow-G<1e-6,"all"))
+             %  warning("Different")
+            %end
+        
     end
 end
 

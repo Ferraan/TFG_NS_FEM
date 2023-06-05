@@ -32,7 +32,7 @@ function [K,Bst,OmegaGlo] = AssemblyMethodBCB(wSTs,Belem,nstrain,nelem,nnodeE,nd
     Viscglo=ConvertBlockDiag(Cglo_w) ;
     OmegaGlo=ConvertBlockDiag(wST);
     time2 = toc(time2) ;
-    disp(['Done (in =',num2str(time2),' s)']); 
+    disp(['Done (in = ',num2str(time2),' s)']); 
     % % Stiffness matrix
     disp('Computing STIFFNESS MATRIX K = BstT.*Cglo_w*Bst  ...')
     %dbstop('34')
