@@ -106,9 +106,9 @@ F=Fbnd;
             %%validation
             time1=toc(time1);
             disp(['Time to assmble K and G slow: ',num2str(time1)]);
-            %if(~all(Kslow-K<1e-6,"all") || ~all(Gslow-G<1e-6,"all"))
-             %  warning("Different")
-            %end
+            if(~all(Kslow-K<1e-6,"all") || ~all(Gslow-G<1e-6,"all"))
+              warning("Different")
+            end
         
     end
 end
