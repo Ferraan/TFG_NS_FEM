@@ -41,7 +41,7 @@ disp('Reading input data for velocity...')
 imat =1 ; % Index material
 PROPMAT(imat).viscosity =  nu  ; %  Kinematic viscosity "imat" (ISOTROPIC)
 % -----------------------------------------------------------
-% 3. Dirichlet boundary conditions (prescribed temperature)
+% 3. Dirichlet boundary conditions (prescribed velocity)
 % -----------------------------------------------------------
 icond = 1; % Number of condition 
 DIRICHLET(icond).NUMBER_LINE = 1 ;   % Number of line

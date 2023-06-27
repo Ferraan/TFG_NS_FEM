@@ -42,7 +42,6 @@ function [u,v,p] = SolverStokes(COOR_v,rnod_v,dR_v,COOR_p,rnod_p,dR_p,K,G,F)
     
     % Solution of the system
     d = A\B;
-    
     % Decomposition of the different terms
     sol(DOFl_v) = d(1:size(Kll,1));
     sol(DOFr_v) = dR_v;
